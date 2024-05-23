@@ -39,4 +39,29 @@ exports.postComment = async (req, res) => {
       // console.log(error)
       res.status(401).json({ msg: "An Error Occurred" })
     }
-  }
+}
+
+exports.getPosts = async (req, res) => {
+    try {
+      const page = parseInt(req.query.page);
+      const size = parseInt(req.query.size);
+  
+      const skip = (page - 1) * size;
+  
+      const total = await Post.countDocuments();
+      const posts = await Post.find().skip(skip).limit(size);
+      await Promise.all(
+        posts.map((post) => post.populate("user", "name picture about"))
+      );
+  
+      res.status(201).send({
+        posts,
+        total,
+        page,
+        size,
+      });
+    } catch (error) {
+      // console.log(error);
+      res.status(400).json(error);
+    }
+};
