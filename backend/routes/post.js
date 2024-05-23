@@ -19,4 +19,7 @@ router.get("/comment", getComment)
 // route comment a post
 router.post("/postcomment", postComment);
 
+// route delete a post
+router.delete("/post", deletePost)
+
 module.exports = router;

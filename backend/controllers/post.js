@@ -94,3 +94,24 @@ exports.getComment = async (req, res) => {
       res.status(400).json({ msg: "error" })
     }
 }
+
+exports.deletePost = async (req, res) => {
+    try {
+      const { postid, userid } = req.body;
+      await Post.deleteOne({ _id: postid });
+      var datas = await User.findById(userid);
+      arr = datas.posts;
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i] == postid) {
+          arr.splice(i, 1);
+        }
+      }
+      datas.posts = arr;
+      datas.save();
+      return res.status(200).json({ mgs: "ok" });
+    } catch (error) {
+      console.log(error);
+      console.log("error in deleting post");
+      return res.status(400).json({ mgs: "Error" });
+    }
+  }

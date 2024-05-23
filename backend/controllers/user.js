@@ -197,6 +197,9 @@ exports.getBookmark = async (req, res) => {
       for (var i = 0; i < arr.length; i++) {
         var pd = await Post.findById(arr[i]);
         if (!pd) {
+          arr.splice(i, 1);
+          data.bookmarks = arr;
+          data.save();
           continue;
         }
         img = pd.image;
