@@ -419,3 +419,17 @@ exports.unfollow = async (req, res) => {
       res.status(400).json({ msg: "error in unfollow" });
     }
 };
+
+exports.uploadProfile = async (req, res) => {
+    try {
+      const { picture, about } = req.body;
+  
+      await User.findByIdAndUpdate(req.body.id, {
+        picture: picture,
+        about: about,
+      });
+      res.status(200).json({ picture, about });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+};

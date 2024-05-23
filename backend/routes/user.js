@@ -12,7 +12,8 @@ const {
     checkBookmark,
     getMyPost,
     follow,
-    unfollow
+    unfollow,
+    uploadProfile
 } = require("../controllers/user")
 
 const router = express.Router();
@@ -52,5 +53,8 @@ router.post("/follow", follow)
 
 // route unfollow a user
 router.post("/unfollow", unfollow)
+
+// route upload profile user
+router.post("/profile", uploadProfile)
 
 module.exports = router;
