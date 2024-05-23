@@ -335,3 +335,43 @@ exports.getMyPost = async (req, res) => {
       return res.status(400).json({ msg: "error" });
     }
 };
+
+exports.follow = async (req, res) => {
+    try {
+      const { id, id2 } = req.body;
+      const user = await User.findById(id);
+      const user2 = await User.findById(id2);
+  
+      var mm = user2.followerscount;
+      mm = mm + 1;
+      user2.followerscount = mm;
+      user2.save();
+
+      var f = 0;
+      var m = user.following;
+      if (m.length == 0) {
+        user.following.push(id2);
+      }
+      else {
+        for (var i = 0; i < m.length; i++) {
+          if (m[i] == id2) {
+            f = 1;
+            break;
+          }
+        }
+        if (!f) {
+          m.push(id2);
+        }
+  
+        user.following = m;
+      }
+      user.followingcount = user.followingcount + 1;
+      user.save();
+
+      return res.status(200).json({ msg: "ok" });
+    } catch (error) {
+      console.log(error);
+      console.log("error in follow");
+      return res.status(400).json({ msg: "error in follow" });
+    }
+};

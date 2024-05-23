@@ -10,7 +10,8 @@ const {
     getBookmark,
     deleteBookmark,
     checkBookmark,
-    getMyPost
+    getMyPost,
+    follow
 } = require("../controllers/user")
 
 const router = express.Router();
@@ -44,5 +45,8 @@ router.post("/checkbookmark", checkBookmark)
 
 // route get all posts of a user
 router.get("/user/post", getMyPost)
+
+// route follow a user
+router.post("/follow", follow)
 
 module.exports = router;
