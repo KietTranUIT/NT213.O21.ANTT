@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 
 const userRoutes = require("./routes/user")
 const uploadRoutes = require("./routes/upload")
+const postRoutes = require("./routes/post")
 
 
 require('dotenv').config();
@@ -40,3 +41,4 @@ app.listen(Port, () => {
 
 app.use("/", userRoutes);
 app.use("/", uploadRoutes);
+app.use("/", postRoutes);

@@ -6,3 +6,5 @@ const router = express.Router();
 
 // route create a post
 router.post("/post", newPost);
+
+module.exports = router;
