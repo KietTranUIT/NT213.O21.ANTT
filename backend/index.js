@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 
+const userRoutes = require("./routes/user")
+
 
 require('dotenv').config();
 const Port = process.env.PORT || 5000;
@@ -16,7 +18,17 @@ mongoose.connect(process.env.MONGO_URI)
     console.error('Connect to mongodb failed!', error);
     });
 
+app.get('/', (req, res) => {
+    res.send('Hello World!')
+})
+
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
+
 // Server lắng nghe trên cổng 3000 hoặc cổng 5000
 app.listen(Port, () => {
     console.log(`Server is running on ${Port}`);
 });
+
+
+app.use("/", userRoutes);
