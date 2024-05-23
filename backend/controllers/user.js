@@ -224,3 +224,40 @@ exports.getBookmark = async (req, res) => {
       return res.status(400).json({ msg: "error" });
     }
 };
+
+exports.deleteBookmark = async (req, res) => {
+    try {
+      const {
+        postid,
+        userid
+      } = req.body;
+      const user = await User.findOne({ _id: userid });
+      var m = user.bookmarks;
+      var f = 0;
+      if (m.length == 0) {
+        return res.status(202).json({ msg: "Does not exists" });
+      }
+      else {
+        for (var i = 0; i < m.length; i++) {
+          if (m[i] == postid) {
+            f = 1;
+            m.splice(i, 1);
+          }
+        }
+        user.bookmarks = m;
+        user.save();
+        if (f == 1) {
+          return res.status(202).json({ msg: "deleted" });
+        }
+        else {
+          return res.status(202).json({ msg: "not found" });
+        }
+  
+      }
+      // user.bookmarks.push(postid);
+    }
+    catch (error) {
+      console.log(error);
+      return res.status(401).json({ msg: "ERROR" })
+    }
+}
