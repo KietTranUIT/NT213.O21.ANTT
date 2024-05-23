@@ -86,6 +86,7 @@ exports.login = async (req, res) => {
     }
   };
 
+// Xử lí yêu cầu đăng xuất từ client
 exports.logout = async(req, res) => {
     try {
         // req.logout((err) => {
@@ -101,10 +102,10 @@ exports.logout = async(req, res) => {
       }
 }
 
-exports.forgotpassword = async (req, res) => {
+// Xử lí yêu cầu quên mật khảu và gửi mã xác thực về mail client
+exports.forgotPassword = async (req, res) => {
     try {
       const { email } = req.body;
-      console.log(email);
       const user = await User.findOne({ email });
       await Code.findOneAndDelete({ user: user._id });
       const code = generateCode(5);
@@ -116,6 +117,26 @@ exports.forgotpassword = async (req, res) => {
       return res.status(200).json({
         message: "Email reset code has been sent to your email",
       });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+};
+
+// Xử lí reset mật khẩu cho client
+exports.resetPassword = async (req, res) => {
+    try {
+      const { email, code, password } = req.body;
+      const user = await User.findOne({ email });
+      const Dbcode = await Code.findOne({ user: user._id });
+      if (Dbcode.code !== code) {
+        return res.status(400).json({
+          message: "Verification code is wrong!",
+        });
+      }
+      const hashed_password = await bcrypt.hash(password, 10);
+      await User.findOneAndUpdate({password: hashed_password})
+      await Code.findOneAndDelete({user: user._id})
+      return res.status(200).json({ message: "ok" });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
