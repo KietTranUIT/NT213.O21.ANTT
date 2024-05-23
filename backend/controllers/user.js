@@ -52,3 +52,33 @@ exports.register = async (req, res) => {
       return res.status(500).json({ message: error.message });
     }
 };
+
+// hàm login xử lí các request đăng nhập từ phía client
+exports.login = async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      const user = await User.findOne({ email:email });
+      if (!user) {
+        return res.status(400).json({
+          message:
+            "the email you entered is not registered.",
+        });
+      }
+      const check = await bcrypt.compare(password, user.password);
+      if (!check) {
+        return res.status(400).json({
+          message: "Invalid Credentials. Please Try Again.",
+        });
+      }
+      const token = generateToken({ id: user._id.toString() }, "15d");
+      res.send({
+        id: user._id,
+        name: user.name,
+        picture: user.picture,
+        token: token,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  };
