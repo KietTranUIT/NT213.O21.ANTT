@@ -261,3 +261,30 @@ exports.deleteBookmark = async (req, res) => {
       return res.status(401).json({ msg: "ERROR" })
     }
 }
+
+exports.checkBookmark = async (req, res) => {
+    try {
+      const {
+        postid,
+        userid
+      } = req.body;
+      const user = await User.findOne({ _id: userid });
+      var m = user.bookmarks;
+      if (m.length == 0) {
+        return res.status(202).json({ msg: "Does not exist" });
+      }
+      else {
+        for (var i = 0; i < m.length; i++) {
+          if (m[i] == postid) {
+            return res.status(202).json({ msg: "ok" });
+          }
+        }
+        return res.status(202).json({ msg: "Does not exists" });
+      }
+      // user.bookmarks.push(postid);
+    }
+    catch (error) {
+      console.log(error);
+      return res.status(401).json({ msg: "ERROR" })
+    }
+  }
