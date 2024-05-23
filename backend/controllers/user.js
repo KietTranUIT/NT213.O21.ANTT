@@ -287,4 +287,48 @@ exports.checkBookmark = async (req, res) => {
       console.log(error);
       return res.status(401).json({ msg: "ERROR" })
     }
-  }
+};
+
+exports.getMyPost = async (req, res) => {
+    try {
+      const { id } = req.body;
+      const data = await User.findById(id)
+  
+      var arr = data.posts;
+      var respon = [];
+      var img = "";
+      var title = "";
+      var desc = "";
+      var imgp = "";
+      var name = "";
+      var userid = "";
+      var postid = "";
+      // console.log(99,arr.length);
+      for (var i = 0; i < arr.length; i++) {
+        var pd = await Post.findById(arr[i]);
+        if (!pd) {
+          continue;
+        }
+        img = pd.image;
+        title = pd.title;
+        desc = pd.description;
+        userid = pd.user;
+        var ud = await User.findById(userid);
+        imgp = ud.picture;
+        name = ud.name;
+        postid = arr[i];
+        respon.push({
+          img: img,
+          title: title,
+          desc: desc,
+          imgp: imgp,
+          name: name,
+          userid: userid,
+          postid: postid
+        })
+      }
+      return res.status(200).json({ msg: respon });
+    } catch (error) {
+      return res.status(400).json({ msg: "error" });
+    }
+};

@@ -10,6 +10,7 @@ const {
     getBookmark,
     deleteBookmark,
     checkBookmark,
+    getMyPost
 } = require("../controllers/user")
 
 const router = express.Router();
@@ -40,5 +41,8 @@ router.delete("/bookmark", deleteBookmark)
 
 // route check post exist in bookmark
 router.post("/checkbookmark", checkBookmark)
+
+// route get all posts of a user
+router.get("/user/post", getMyPost)
 
 module.exports = router;
