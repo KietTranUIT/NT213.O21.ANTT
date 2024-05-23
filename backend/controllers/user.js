@@ -141,3 +141,41 @@ exports.resetPassword = async (req, res) => {
       res.status(500).json({ message: error.message });
     }
   };
+
+exports.bookmark = async (req, res) => {
+    try {
+      const {
+        postid,
+        userid
+      } = req.body;
+      const user = await User.findOne({ _id: userid });
+      var m = user.bookmarks;
+      var f = 0;
+      if (m.length == 0) {
+        user.bookmarks.push(postid);
+      }
+      else {
+        for (var i = 0; i < m.length; i++) {
+          if (m[i] == postid) {
+            f = 1;
+            m.splice(i, 1);
+            m.push(postid);
+            user.bookmarks = m;
+            break;
+          }
+        }
+      }
+      if (f == 1) {
+        user.save();
+        return res.status(202).json({ msg: "exists" });
+      }
+      else {
+        user.bookmarks.push(postid);
+        user.save();
+        return res.status(202).json({ msg: "ok" });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(401).json({ msg: "ERROR" })
+    }
+};

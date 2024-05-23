@@ -5,7 +5,8 @@ const {
     login,
     logout,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    bookmark
 } = require("../controllers/user")
 
 const router = express.Router();
@@ -24,5 +25,8 @@ router.post("/forgotpassword", forgotPassword)
 
 // route reset password
 router.post("/resetpassword", resetPassword)
+
+// route add a post into bookmark
+router.post("/bookmark", bookmark)
 
 module.exports = router;
