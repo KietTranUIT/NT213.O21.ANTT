@@ -11,7 +11,8 @@ const {
     deleteBookmark,
     checkBookmark,
     getMyPost,
-    follow
+    follow,
+    unfollow
 } = require("../controllers/user")
 
 const router = express.Router();
@@ -48,5 +49,8 @@ router.get("/user/post", getMyPost)
 
 // route follow a user
 router.post("/follow", follow)
+
+// route unfollow a user
+router.post("/unfollow", unfollow)
 
 module.exports = router;

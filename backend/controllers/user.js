@@ -375,3 +375,47 @@ exports.follow = async (req, res) => {
       return res.status(400).json({ msg: "error in follow" });
     }
 };
+
+exports.unfollow = async (req, res) => {
+    try {
+      const { id, id2 } = req.body;
+      const user = await User.findById(id);
+      const user2 = await User.findById(id2);
+
+      var mm = user2.followerscount
+      if (mm - 1 < 0) {
+        mm = 0;
+      }
+      else {
+        mm = mm - 1;
+      }
+      user2.followerscount = mm;
+      user2.save();
+
+      var f = 0;
+      var m = user.following;
+      if (m.length == 0) {
+        return res.status(200).json({ msg: "ok" });
+        // user.following.push(id2);
+      }
+      else {
+        for (var i = 0; i < m.length; i++) {
+          if (m[i] == id2) {
+            f = 1;
+            m.splice(i, 1);
+            break;
+          }
+        }
+        user.following = m;
+      }
+
+      if (f == 1) {
+        user.followingcount = user.followingcount - 1
+      }
+      user.save();
+      res.status(200).json({ msg: "ok" });
+    } catch (error) {
+      console.log("error in unfollow");
+      res.status(400).json({ msg: "error in unfollow" });
+    }
+};
