@@ -1,6 +1,9 @@
 const { validateEmail, validateLength } = require("../helper/validation");
 const { generateToken } = require("../helper/token");
+const generateCode = require("../helper/gencode")
+const {sendResetCode} = require("../helper/mail")
 const User = require("../models/User");
+const Code = require("../models/Code");
 const bcrypt = require("bcrypt");
 
 
@@ -97,3 +100,23 @@ exports.logout = async(req, res) => {
         return res.status(500).json({ message: error.message });
       }
 }
+
+exports.forgotpassword = async (req, res) => {
+    try {
+      const { email } = req.body;
+      console.log(email);
+      const user = await User.findOne({ email });
+      await Code.findOneAndDelete({ user: user._id });
+      const code = generateCode(5);
+      const savedCode = await new Code({
+        code,
+        user: user._id,
+      }).save();
+      sendResetCode(user.email, user.name, code);
+      return res.status(200).json({
+        message: "Email reset code has been sent to your email",
+      });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };
