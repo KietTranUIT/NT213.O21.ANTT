@@ -65,3 +65,17 @@ exports.getPosts = async (req, res) => {
       res.status(400).json(error);
     }
 };
+
+exports.getPostData = async (req, res) => {
+    try {
+      const { id } = req.body;
+      var data = await Post.findById(id);
+      // console.log(data.user);
+      //const datau = await User.findById(data.user)
+  
+      return res.status(200).json({ msg: data})
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({ msg: "error" });
+    }
+  }
