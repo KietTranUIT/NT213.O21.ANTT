@@ -9,7 +9,7 @@ const {
     bookmark,
     getBookmark,
     deleteBookmark,
-    checkBookmark
+    checkBookmark,
 } = require("../controllers/user")
 
 const router = express.Router();

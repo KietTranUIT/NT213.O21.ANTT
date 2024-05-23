@@ -4,7 +4,10 @@ const User = require("../models/User");
 exports.newPost = async (req, res) => {
   try {
     const newPost = await new Post(req.body).save();
+    const data = await User.findById(req.body.user)
     await newPost.populate("user", "name picture");
+    data.posts.push(newPost._id)
+    data.save();
     res.json(newPost);
   } catch (error) {
     // console.log(error)
