@@ -1,4 +1,7 @@
 const cloudinary = require("cloudinary");
+const fs = require("fs");
+require('dotenv').config();
+
 
 // Thiết lập cấu hình cho cloudinary
 cloudinary.config({

@@ -1,8 +1,10 @@
 const express = require("express");
+const fileUpload = require("express-fileupload")
 const app = express();
 const mongoose = require("mongoose");
 
 const userRoutes = require("./routes/user")
+const uploadRoutes = require("./routes/upload")
 
 
 require('dotenv').config();
@@ -24,6 +26,11 @@ app.get('/', (req, res) => {
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
+app.use(
+    fileUpload({
+      useTempFiles: true,
+    })
+);
 
 // Server lắng nghe trên cổng 3000 hoặc cổng 5000
 app.listen(Port, () => {
@@ -32,3 +39,4 @@ app.listen(Port, () => {
 
 
 app.use("/", userRoutes);
+app.use("/", uploadRoutes);
