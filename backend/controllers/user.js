@@ -82,3 +82,18 @@ exports.login = async (req, res) => {
       res.status(500).json({ message: "Internal Server Error" });
     }
   };
+
+exports.logout = async(req, res) => {
+    try {
+        // req.logout((err) => {
+        //   if (err) {
+        //     return res.status(400).json("Couldn't logout");
+        //   }
+        // });
+        res.cookie('session', '', { expires: new Date(0), });
+        res.clearCookie("sessionId");
+        res.status(200).json({ success: true });
+      } catch (error) {
+        return res.status(500).json({ message: error.message });
+      }
+}

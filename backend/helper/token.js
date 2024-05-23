@@ -7,3 +7,5 @@ exports.generateToken = (payload, expired) => {
   });
 };
 
+
+
