@@ -78,4 +78,16 @@ exports.getPostData = async (req, res) => {
       console.log(error);
       return res.status(400).json({ msg: "error" });
     }
-  }
+}
+
+exports.getComment = async (req, res) => {
+    try {
+      const { id } = req.body;
+      const data = await Post.findOne({ user: id });
+      const user = data.comments
+      res.status(201).json(user);
+    } catch (error) {
+      // console.log(error)
+      res.status(400).json({ msg: "error" })
+    }
+}

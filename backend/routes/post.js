@@ -1,6 +1,6 @@
 const express = require("express");
 
-const {newPost, postComment, getPosts, getPostData} = require("../controllers/post");
+const {newPost, postComment, getPosts, getPostData, getComment} = require("../controllers/post");
 
 const router = express.Router();
 
@@ -12,6 +12,9 @@ router.get("/posts", getPosts)
 
 // route get a post data
 router.get("/post", getPostData)
+
+// route get all comments of a post
+router.get("/comment", getComment)
 
 // route comment a post
 router.post("/postcomment", postComment);
