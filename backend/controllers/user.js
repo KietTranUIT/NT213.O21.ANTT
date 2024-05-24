@@ -11,13 +11,13 @@ const bcrypt = require("bcrypt");
 // hàm register xử lí các request đăng kí từ client
 exports.register = async (req, res) => {
     try {
-      const { name, email, password } = req.body;
+      const { name, temail, password } = req.body;
       if (!validateLength(name, 6, 15)) {
         return res
         .status(400)
         .json({ message: "Enter name between 6 to 15 characters !" });
       }
-      if (!validateEmail(email)) {
+      if (!validateEmail(temail)) {
         return res.status(400).json({ message: "Please enter a valid email !" });
       }
       
@@ -28,7 +28,7 @@ exports.register = async (req, res) => {
       }
       
       // kiểm tra xem email đăng kí đã tồn tại hay chưa
-      const check = await User.findOne({ email });
+      const check = await User.findOne({ email: temail });
       if (check) {
         return res.status(400).json({
           message:
@@ -39,7 +39,7 @@ exports.register = async (req, res) => {
       const hashed_password = await bcrypt.hash(password, 10);
       const user = await new User({
         name:name,
-        email:email,
+        email:temail,
         password: hashed_password,
         verify: true
       }).save();
@@ -60,8 +60,8 @@ exports.register = async (req, res) => {
 // hàm login xử lí các request đăng nhập từ phía client
 exports.login = async (req, res) => {
     try {
-      const { email, password } = req.body;
-      const user = await User.findOne({ email:email });
+      const { temail, password } = req.body;
+      const user = await User.findOne({ email:temail });
       if (!user) {
         return res.status(400).json({
           message:
@@ -108,6 +108,10 @@ exports.forgotPassword = async (req, res) => {
     try {
       const { email } = req.body;
       const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(400).json({msg: 'User not found'})
+      }
+      
       await Code.findOneAndDelete({ user: user._id });
       const code = generateCode(5);
       const savedCode = await new Code({
@@ -134,6 +138,13 @@ exports.resetPassword = async (req, res) => {
           message: "Verification code is wrong!",
         });
       }
+
+      if (!validateLength(password, 6, 15)) {
+        return res
+        .status(400)
+        .json({ message: "Enter password between 6 to 15 characters !" });
+      }
+
       const hashed_password = await bcrypt.hash(password, 10);
       await User.findOneAndUpdate({password: hashed_password})
       await Code.findOneAndDelete({user: user._id})
@@ -183,7 +194,7 @@ exports.bookmark = async (req, res) => {
 
 exports.getBookmark = async (req, res) => {
     try {
-      const { id } = req.body;
+      const { id } = req.params;
       const data = await User.findById(id)
       var arr = data.bookmarks;
       var respon = [];
@@ -233,7 +244,7 @@ exports.deleteBookmark = async (req, res) => {
       const {
         postid,
         userid
-      } = req.body;
+      } = req.query;
       const user = await User.findOne({ _id: userid });
       var m = user.bookmarks;
       var f = 0;
@@ -294,7 +305,7 @@ exports.checkBookmark = async (req, res) => {
 
 exports.getMyPost = async (req, res) => {
     try {
-      const { id } = req.body;
+      const { id } = req.params;
       const data = await User.findById(id)
   
       var arr = data.posts;
@@ -339,6 +350,9 @@ exports.getMyPost = async (req, res) => {
 exports.follow = async (req, res) => {
     try {
       const { id, id2 } = req.body;
+      if (id === id2) {
+        return res.status(400).json({ msg: "duplicate" });
+      }
       const user = await User.findById(id);
       const user2 = await User.findById(id2);
   
@@ -379,6 +393,9 @@ exports.follow = async (req, res) => {
 exports.unfollow = async (req, res) => {
     try {
       const { id, id2 } = req.body;
+      if (id === id2) {
+        return res.status(400).json({ msg: "duplicate" });
+      }
       const user = await User.findById(id);
       const user2 = await User.findById(id2);
 
@@ -423,6 +440,8 @@ exports.unfollow = async (req, res) => {
 exports.uploadProfile = async (req, res) => {
     try {
       const { picture, about } = req.body;
+      console.log(picture, about)
+      console.log(req.body.id)
   
       await User.findByIdAndUpdate(req.body.id, {
         picture: picture,
@@ -433,3 +452,111 @@ exports.uploadProfile = async (req, res) => {
       res.status(500).json({ message: error.message });
     }
 };
+
+exports.getUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+    const { password, ...otherdata } = user
+    res.status(200).json(otherdata);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.search = async (req, res) => {
+  try {
+    const { q } = req.query;
+    const data = await Post.find({ 
+      $or: [
+        {"tech":{ $regex: `${q}`, $options: 'i' }},
+        {"title": { $regex: `${q}`, $options: 'i' } },
+        {"description": { $regex: `${q}`, $options: 'i' }}
+      ]});
+
+    await Promise.all(
+        data.map((post) => post.populate("user", "name picture about"))
+    );
+
+    if (data.length === 0) {
+      return res.status(200).json({ msg: [] });
+    }
+    return res.status(200).json(data);
+  } catch (error) {
+    console.log("error in search");
+    return res.status(400).json({ msg: "error in search" });
+  }
+};
+
+exports.followercount = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const user = await User.findById(id);
+    var count = user.followerscount;
+    return res.status(200).json({ msg: count });
+  } catch (error) {
+    console.log("error in followcount");
+    return res.status(400).json({ msg: "error in followcount" });
+  }
+}
+exports.followingcount = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const user = await User.findById(id);
+    var count = user.followingcount;
+    return res.status(200).json({ msg: count });
+  } catch (error) {
+    console.log("error in followingcount");
+    return res.status(400).json({ msg: "error in followingcount" });
+  }
+}
+
+exports.checkfollowing = async (req, res) => {
+  try {
+    const { id, id2 } = req.body;
+    const user = await User.findById(id);
+    const arr = user.following;
+    if (id === id2) {
+      return res.status(200).json({ msg: "duplicate" });
+    }
+    if (arr.length == 0) {
+      return res.status(200).json({ msg: "not" });
+    }
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i] === id2) {
+        return res.status(200).json({ msg: "ok" });
+      }
+    }
+    return res.status(200).json({ msg: "not" });
+  } catch (error) {
+    console.log(error)
+    return res.status(400).json({ msg: "error in fetchcheckfollow" });
+  }
+}
+
+exports.fetchfollowing = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const user = await User.findById(id);
+    const arr = user.following;
+    const resp = [];
+    var name = "";
+    var pic = "";
+    var pid = "";
+    for (var i = 0; i < arr.length; i++) {
+      var dat = await User.findById(arr[i]);
+      name = dat.name;
+      pic = dat.picture;
+      pid = arr[i];
+      resp.push({
+        name: name,
+        pic: pic,
+        pid: pid
+      })
+    }
+    return res.status(200).json({ msg: resp });
+  } catch (error) {
+    console.log("error in fetchfollow");
+    return res.status(400).json({ msg: "error in fetchfollow" });
+  }
+}

@@ -11,10 +11,10 @@ router.post("/post", newPost);
 router.get("/posts", getPosts)
 
 // route get a post data
-router.get("/post", getPostData)
+router.get("/post/:id", getPostData)
 
 // route get all comments of a post
-router.get("/comment", getComment)
+router.get("/comment/:id", getComment)
 
 // route comment a post
 router.post("/postcomment", postComment);

@@ -13,7 +13,13 @@ const {
     getMyPost,
     follow,
     unfollow,
-    uploadProfile
+    uploadProfile,
+    getUser,
+    search,
+    followercount,
+    followingcount,
+    checkfollowing,
+    fetchfollowing
 } = require("../controllers/user")
 
 const router = express.Router();
@@ -27,6 +33,9 @@ router.post("/login", login);
 // route logout
 router.get("/logout", logout);
 
+// route get user data
+router.get("/user/:userId", getUser);
+
 // route forgot password
 router.post("/forgotpassword", forgotPassword)
 
@@ -37,7 +46,7 @@ router.post("/resetpassword", resetPassword)
 router.post("/bookmark", bookmark)
 
 // route get all bookmarks of a user
-router.get("/bookmark", getBookmark)
+router.get("/bookmark/:id", getBookmark)
 
 // route delete a post from bookmark
 router.delete("/bookmark", deleteBookmark)
@@ -46,7 +55,7 @@ router.delete("/bookmark", deleteBookmark)
 router.post("/checkbookmark", checkBookmark)
 
 // route get all posts of a user
-router.get("/user/post", getMyPost)
+router.get("/user/:id/post", getMyPost)
 
 // route follow a user
 router.post("/follow", follow)
@@ -56,5 +65,15 @@ router.post("/unfollow", unfollow)
 
 // route upload profile user
 router.post("/profile", uploadProfile)
+
+// route search
+router.get("/search", search);
+
+router.post("/countfollower", followercount);
+router.post("/countfollowing", followingcount);
+
+router.post("/checkfollow", checkfollowing);
+
+router.post("/fetchfollowing", fetchfollowing);
 
 module.exports = router;

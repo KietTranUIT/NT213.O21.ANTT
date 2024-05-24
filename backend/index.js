@@ -2,6 +2,7 @@ const express = require("express");
 const fileUpload = require("express-fileupload")
 const app = express();
 const mongoose = require("mongoose");
+const cors = require("cors");
 
 const userRoutes = require("./routes/user")
 const uploadRoutes = require("./routes/upload")
@@ -10,6 +11,15 @@ const postRoutes = require("./routes/post")
 
 require('dotenv').config();
 const Port = process.env.PORT || 5000;
+
+app.use(
+    cors({
+      origin: ["http://localhost:8181", "http://localhost:3000"],
+      //origin: ["https://allblogwebsiteapi.onrender.com", "https://allblogapp-project.vercel.app"],
+      methods: "GET,POST,PUT,DELETE",
+      credentials: true,
+    })
+);
 
 // Kết nối đến mongodb
 mongoose.set("strictQuery", false);

@@ -71,10 +71,11 @@ exports.getPosts = async (req, res) => {
 
 exports.getPostData = async (req, res) => {
     try {
-      const { id } = req.body;
+      const { id } = req.params;
       var data = await Post.findById(id);
       // console.log(data.user);
       //const datau = await User.findById(data.user)
+      await data.populate("user", "name picture about")
   
       return res.status(200).json({ msg: data})
     } catch (error) {
@@ -85,8 +86,8 @@ exports.getPostData = async (req, res) => {
 
 exports.getComment = async (req, res) => {
     try {
-      const { id } = req.body;
-      const data = await Post.findOne({ user: id });
+      const { id } = req.params;
+      const data = await Post.findOne({ _id: id });
       const user = data.comments
       res.status(201).json(user);
     } catch (error) {
@@ -97,7 +98,7 @@ exports.getComment = async (req, res) => {
 
 exports.deletePost = async (req, res) => {
     try {
-      const { postid, userid } = req.body;
+      const { postid, userid } = req.query;
       await Post.deleteOne({ _id: postid });
       var datas = await User.findById(userid);
       arr = datas.posts;
